@@ -17,7 +17,6 @@ namespace MySQLDataToJson
 {
     public partial class frmMain : Form
     {
-        
         private MySqlConnection _connection;
         private string CurrentFilePath = Environment.CurrentDirectory;
 
@@ -106,7 +105,16 @@ namespace MySQLDataToJson
                     {
                         dt.Columns.Remove(dc);
                     }
-
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        foreach (DataColumn dc in dt.Columns)
+                        {
+                            if (dr[dc.ColumnName] == null || dc.DataType == typeof(string))
+                            {
+                                dr[dc.ColumnName] = "";
+                            }
+                        }
+                    }
                     txtResult.Text = JsonConvert.SerializeObject(dt);
 
                     File.WriteAllText(Path.Combine(this.CurrentFilePath, $"{txtDatabase.Text}-{lbTableList.Text.ToLower()}.fieldconfig"), JsonConvert.SerializeObject(columns));
