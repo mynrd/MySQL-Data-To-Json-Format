@@ -10,5 +10,6 @@ namespace MySQLDataToJson
     {
         public string FieldName { get; set; }
         public string UpdatedFieldName { get; set; }
+        public string FieldDataType { get; set; }
     }
 }

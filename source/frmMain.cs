@@ -95,7 +95,7 @@ namespace MySQLDataToJson
 #endif
                     var listColumnToBeRemove = new List<DataColumn>();
 
-                    var validColumns = columns.Where(x => !string.IsNullOrWhiteSpace(x.UpdatedFieldName));
+                    var validColumns = columns.Where(x => !string.IsNullOrWhiteSpace(x.UpdatedFieldName)).ToList();
 
                     foreach (DataColumn dc in dt.Columns)
                     {
@@ -103,6 +103,7 @@ namespace MySQLDataToJson
                         if (col != null)
                         {
                             dc.ColumnName = col.UpdatedFieldName;
+                            col.FieldDataType = dc.DataType.ToString();
                         }
                         else
                         {
@@ -116,11 +117,11 @@ namespace MySQLDataToJson
                     }
                     foreach (DataRow dr in dt.Rows)
                     {
-                        foreach (DataColumn dc in dt.Columns)
+                        foreach (var dc in validColumns)
                         {
-                            if (dr[dc.ColumnName] == null || dc.DataType == typeof(string))
+                            if (dr[dc.UpdatedFieldName] == null && dc.FieldDataType == typeof(string).ToString())
                             {
-                                dr[dc.ColumnName] = "";
+                                dr[dc.UpdatedFieldName] = "";
                             }
                         }
                     }
