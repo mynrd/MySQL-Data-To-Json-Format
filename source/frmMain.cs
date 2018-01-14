@@ -86,11 +86,20 @@ namespace MySQLDataToJson
                     {
                         FieldName = x.Text,
                         UpdatedFieldName = x.SubItems[1].Text,
-                    }).Where(x => !string.IsNullOrWhiteSpace(x.UpdatedFieldName));
+                    });
+#if DEBUG
+                    foreach (var item in columns)
+                    {
+                        Debug.WriteLine($"{item.FieldName} - {item.UpdatedFieldName}");
+                    }
+#endif
                     var listColumnToBeRemove = new List<DataColumn>();
+
+                    var validColumns = columns.Where(x => !string.IsNullOrWhiteSpace(x.UpdatedFieldName));
+
                     foreach (DataColumn dc in dt.Columns)
                     {
-                        var col = columns.FirstOrDefault(x => x.FieldName == dc.ColumnName);
+                        var col = validColumns.FirstOrDefault(x => x.FieldName == dc.ColumnName);
                         if (col != null)
                         {
                             dc.ColumnName = col.UpdatedFieldName;
@@ -118,6 +127,12 @@ namespace MySQLDataToJson
                     txtResult.Text = JsonConvert.SerializeObject(dt);
 
                     File.WriteAllText(Path.Combine(this.CurrentFilePath, $"{txtDatabase.Text}-{lbTableList.Text.ToLower()}.fieldconfig"), JsonConvert.SerializeObject(columns));
+                    var fileSave = new SaveFileDialog() { DefaultExt = ".json" };
+                
+                    if (fileSave.ShowDialog() == DialogResult.OK)
+                    {
+                        File.WriteAllText(fileSave.FileName, txtResult.Text);
+                    }
                 }
             }
             catch (Exception ex)
